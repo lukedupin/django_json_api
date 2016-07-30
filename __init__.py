@@ -133,26 +133,3 @@ def rawResponse( objs, status, content, callback=None ):
                          status=status, content_type=content )
   else:
     return HttpResponse( objs, status=status, content_type=content )
-
-  #Simple object access
-def getModelById( klass, id, usr ):
-  inst = klass.getById( id )
-  if inst is None:
-    return (None, "Couldn't find %s by: %d" % (klass.__name__,  id))
-  return validateModel( inst, usr )
-
-def validateModel( inst, usr ):
-  if inst is None:
-    return (None, "Invalid None instance")
-  if not inst.canAccess( usr ):
-      #Get the username, and then return
-    from django.contrib.auth.models import User
-    from website.models import UserWrapper
-    if isinstance( usr, UserWrapper ):
-      username = usr.user.username
-    elif isinstance( usr, User ):
-      username = usr.username
-    else:
-      username = "Unknown"
-    return (None, "Invalid access for %s" % username)
-  return (inst, None)
