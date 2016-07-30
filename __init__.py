@@ -1,6 +1,62 @@
 from django.http import HttpResponse
-from website.helpers import util
 import json
+
+def xstr( s, none='' ):
+  return str(s) if s is not None else none
+
+def xint( s, none=0, undefined=None ):
+  try:
+    if s == "undefined":
+      return undefined
+    return int(s) if s is not None and s != 'NaN' else none
+  except ValueError:
+      #Floating points and trailing letters wont fool me!!!
+    m = re.search('^[-+]?[0-9]+', s)
+    if m:
+      return int(m.group(0))
+
+      #can't go any further
+    return none
+  except TypeError:
+    return none
+
+def xfloat( s, none=0.0, undefined=None ):
+  try:
+    if s == "undefined":
+      return undefined
+    f = float(s) if s is not None and s != 'NaN' else none
+    if math.isnan(f):
+      return none
+    return f
+  except ValueError:
+      #trailing letters wont fool me!!!
+    m = re.search('^[-+]?[0-9]*\.?[0-9]+', s )
+    if m:
+      return float(m.group(0))
+
+      #Can't go any further
+    return none
+  except TypeError:
+    return none
+
+def xbool( s, none=False, undefined=False ):
+    #Are we string? try to figure out what that means
+  if isinstance( s, str ):
+    s = s.lower()
+    if s == 'true':
+      return True
+    elif s == 'none' or s == 'null':
+      return none
+    elif s == 'undefined':
+      return undefined
+    else:
+      return False
+
+    #Special case none
+  elif s is None:
+    return none
+  else:
+    return bool(s)
 
 #value name converions
 def _vn( n ):
@@ -11,11 +67,11 @@ def _vc( t, r, v ):
   if t is None:
     return ( v, None )
   elif t == 'i':
-    return ( util.xint(v), None )
+    return ( xint(v), None )
   elif t == 'f':
-    return ( util.xfloat(v), None )
+    return ( xfloat(v), None )
   elif t == 'b':
-    return ( util.xbool(v, none=None, undefined=None), None )
+    return ( xbool(v, none=None, undefined=None), None )
   elif t == 'j':
     try:
       return ( json.loads( v), None )
