@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-import json
+import json, re
 
 def xstr( s, none='' ):
   return str(s) if s is not None else none
