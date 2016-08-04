@@ -1,6 +1,6 @@
 # Django Json API
 Wrapper methods to streamline json based API communication through django.  This library is a simple set of calls which provide: 
-* Streamline variable injection
+* Variable injection
 * Type conversion
 * Json payload structure checking
 * Json HTTP response
@@ -52,6 +52,14 @@ Now inside your app, lets include the helper functions:
             #Always returns { successful: True, message: 'great', data:{...} }
 		return jsonResponse( request, { message: 'great', data: {...} })
 
+Variable types can be specified.  The possible types are as folows:
+
+* var - No conversion, variables will be strings.  IN ALL CASES the variable will be None if it doesn't exist.
+* i#var - Convert value to an integer.  0 if no possible conversion.
+* f#var - Convert value to a float.  0.0f if no possible conversion.
+* b#var - Convert value to boolean.  False if none exists
+* j#var - Convert value to dict using json.loads(content).  Error response if the conversion fails.  Also, if j# is used, an optional tuple can be passed, the second element of the tuple is a tuple of strings.  Each of these values will be checked against the resulting json object, ensuring all of those keys exist.  If a key is missing, a well formed error is returned to the user.  Example:  ('j#var', ('key1', 'key2', 'key3'))
+
 Lets look at an example of json data inside our arguments:
 
 	from website.views.json_api import jsonResponse, errResponse, reqArgs
@@ -84,7 +92,7 @@ Lets look at an example of json data inside our arguments:
             
 		return jsonResponse( request, {...})
         
-Perhaps we have optional arguments and we want to iterate through them?
+Perhaps we have optional arguments and we want to iterate through them?  No problem.  All key value pairs are captured inside the variable req_args.  req_args can be used in conjuction with function parameters:
 
     #Notice we don't have to have all the parameters listed in reqArgs
     #req_args will get all variables @reqArgs deals with
@@ -110,9 +118,10 @@ Finally, lets say you want to call one of your methods that has @reqArgs?  No pr
  
 	from website.views.json_api import jsonResponse, errResponse, reqArgs
     
+    contains = ('key1', 'key2')
     @reqArgs( get_args=('i#project_id'),  #Required get arguments
               post_args=('action',       #Required post arguments
-                         'j#data'),
+                         ('j#data', contains),
               post_opts=('i#user_id'))    #Optional post arguments
     def api( request, project_id, action, data, user_id, **kwargs ):
     	...
