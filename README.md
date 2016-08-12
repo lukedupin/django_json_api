@@ -15,7 +15,17 @@ Assuming your django project has this basic structure for views, {{base}}/websit
 
 # Usage
 
+All @reqArgs arguments are optional, here is a list of them:
+
+* get_args - Accepts a string, tuple, or array.  Key values specified here are ~required~ GET or URL variables.
+* post_args - Accepts a string, tuple, or array.  Key values specified here are ~required~ POST variables.
+* get_opts - Accepts a string, tuple, or array.  Key values specified here are ~optional~ GET or URL variables.
+* post_opts - Accepts a string, tuple, or array.  Key values specified here are ~optional~ POST variables.
+* auth - Accepts boolean True/False or a funciton call.  If Boolean true, default django authentication is used.  If a function, the funciton is called passing all arguments, and expects a boolean return (True authenticated, False not)
+
 Build your url.py exactly the same way you would without @reqArgs.  @reqArgs operates entirely based on the JSON payload.  The variables loaded in with reqArgs wont overwrite possible variables from url.py.  Both play together nicely.
+
+# Examples
 
 Now inside your app, lets include the helper functions:
 
@@ -126,3 +136,48 @@ Finally, lets say you want to call one of your methods that has @reqArgs?  No pr
         #Call the reqArgs function, passing no positional arguments
 		return api( request=request, project_id=project_id, action="update", data={})  #Notice its okay to leave out optional arguments
  
+How about using the automatic user auth logic?
+
+	from website.views.json_api import jsonResponse, errResponse, reqArgs
+    
+    @reqArgs( auth=True,					#Requires request.user.is_authenticated() to be true
+    		  get_args=('i#project_id'))  	#Required get arguments
+    def api( request, project_id, action, data, user_id, **kwargs ):
+		return jsonResponse( request, {...})
+ 
+ 	def customAuth( request, project_id, **kwargs ):
+    	if project_id == 4: #Authenticate the user that passes project_id == 4
+        	return True
+        else:
+        	return request.user.id == 4 #If the logged in user's id is 4, success, else not authenticated
+            
+    @reqArgs( auth=customAuth,			  #Custom authenticate
+    		  get_args=('i#project_id'))  #Required get arguments
+    def otherApi( request, project_id, **kwargs ):
+		return jsonResponse( request, {...})
+        
+# Common error
+
+What if you run into this error?
+
+    Internal Server Error: /user_info.json
+    Traceback (most recent call last):
+      File "/usr/lib/python3.5/site-packages/django/core/handlers/base.py", line 149, in get_response
+        response = self.process_exception_by_middleware(e, request)
+      File "/usr/lib/python3.5/site-packages/django/core/handlers/base.py", line 147, in get_response
+        response = wrapped_callback(request, *callback_args, **callback_kwargs)
+      File "xxx/website/views/json_api/__init__.py", line 188, in wrapper
+        return func( *args, **kwargs)
+    TypeError: userInfo() got an unexpected keyword argument 'req_args'
+    
+Good news, its easy to fix, you forgot to add **kwargs to the end of your function.  Convert your function from:
+
+    @reqArgs( ... )
+    def user_info( request, xxx):
+    
+To this:
+    
+    @reqArgs( ... )
+    def user_info( request, xxx, **kwargs ):
+
+Why does this happen?  Because a variable called ~req_args~ is always passed, the collection of all user specified variables.  Although you could specific ~req_args~ inside your function, in practice its better to always include **kwargs.
