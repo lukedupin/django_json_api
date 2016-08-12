@@ -80,11 +80,12 @@ def _vc( t, r, v ):
   else:
     return ( v, None )
 
-#Ensure my data arguments exist, if not, return error
+#Request args wrapper class
 class reqArgs:
-  def __init__(self, get_args=[], post_args=[], get_opts=[], post_opts=[] ):
+  def __init__(self, auth=None, get_args=[], post_args=[], get_opts=[], post_opts=[] ):
     def _arg( arg ):
       return [ arg ] if isinstance( arg, str ) else arg
+    self.auth = auth
     self.get_args = _arg( get_args )
     self.post_args = _arg( post_args )
     self.get_opts = _arg( get_opts )
@@ -97,6 +98,7 @@ class reqArgs:
       request = kwargs['request'] if 'request' in kwargs else args[0]
       get_missing = []
       post_missing = []
+
 
         #Internal function which runs the assignment action
       def pullArgs( request_args, req_dict, missing ):
@@ -163,6 +165,26 @@ class reqArgs:
 
         #Store all args into the requested args hash
       kwargs['req_args'] = req_args
+
+        #Auth check?
+      if self.auth is not None:
+          #True for check authentication with default system auth
+        if isinstance( self.auth, bool ):
+          if self.auth:
+            if not request.user.is_authenticated():
+              return errResponse( request, "Not logged in")
+
+          #Custom user authentication, we just just need a true/false
+        elif hasattr( self.auth, '__call__'):
+          if not self.auth( *args, **kwargs ):
+            return errResponse( request, "Not logged in")
+
+          #Not sure what we were pass, default to system authentication
+        else:
+          print("Unknown auth type, running default authentication to be safe")
+          if not request.user.is_authenticated():
+            return errResponse( request, "Not logged in")
+
       return func( *args, **kwargs)
     return wrapper
 
