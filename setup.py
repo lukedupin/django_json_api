@@ -11,13 +11,12 @@ setup(name='django_json_api',
       description="Streamline JSON API function wrappers for your django app.",
       author='Luke Dupin',
       url='https://github.com/lukedupin/django_json_api',
+      download_url='https://github.com/lukedupin/django_json_api/tarball/1.1.7',
       author_email='orbital.sfear@gmail.com',
+      keywords = ['django', 'rest', 'api', 'json'],
       install_requires=[
-          'tox', 'pytest', 'sh'
+          'tox', 'pytest', 'sh', 'Django',
       ],
-      entry_points={
-          'console_scripts': ['django_json_api = django_json_api.__main__:main']
-      },
       classifiers=[
           'Intended Audience :: Developers',
           'Intended Audience :: Customer Service',
@@ -28,7 +27,6 @@ setup(name='django_json_api',
           'Operating System :: POSIX',
           'Programming Language :: Python',
           'Programming Language :: Python :: 3',
-          'Programming Language :: Python :: 3.4',
           'Programming Language :: Python :: 3.5',
           'Topic :: Software Development',
           'Topic :: Software Development :: Libraries',

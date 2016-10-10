@@ -1,5 +1,3 @@
-import sys
-
 __project__ = "django_json_api"
 __version__ = "1.1.7"
 
