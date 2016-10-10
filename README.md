@@ -1,3 +1,10 @@
+## django_json_api
+
+[![Build Status](https://travis-ci.org/kootenpv/django_json_api.svg?branch=master)](https://travis-ci.org/kootenpv/django_json_api)
+[![PyPI](https://img.shields.io/pypi/v/django_json_api.svg?style=flat-square)](https://pypi.python.org/pypi/django_json_api/)
+[![PyPI](https://img.shields.io/pypi/pyversions/django_json_api.svg?style=flat-square)](https://pypi.python.org/pypi/django_json_api/)
+
+
 # Django Json API
 Wrapper methods to streamline json based API communication through django.  This library is a simple set of calls which provide: 
 * Variable injection
