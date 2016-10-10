@@ -1,6 +1,6 @@
 ## django_json_api
 
-[![Build Status](https://travis-ci.org/kootenpv/django_json_api.svg?branch=master)](https://travis-ci.org/kootenpv/django_json_api)
+[![Build Status](https://travis-ci.org/lukedupin/django_json_api.svg?branch=master)](https://travis-ci.org/lukedupin/django_json_api)
 [![PyPI](https://img.shields.io/pypi/v/django_json_api.svg?style=flat-square)](https://pypi.python.org/pypi/django_json_api/)
 [![PyPI](https://img.shields.io/pypi/pyversions/django_json_api.svg?style=flat-square)](https://pypi.python.org/pypi/django_json_api/)
 
